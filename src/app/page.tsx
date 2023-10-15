@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from "framer-motion";
 import clsx from 'clsx';
+import useIsMobile from './hooks/useIsMobile';
 
 const ANIMATION_DURATION = 800;
 
@@ -59,18 +60,18 @@ const playSound = (src: string) => {
 export default function Home() {
   // State for cards, flipped cards, matched cards, and the current card pair
   const [cards, setCards] = React.useState<Card[]>([]);
-
+  const isMobile = useIsMobile();
   const [flippedIds, setFlippedIds] = React.useState<number[]>([]);
   const [matchedIds, setMatchedIds] = React.useState<number[]>([]);
   const [currentCard, setCurrentCard] = React.useState<Card | undefined>();
   const [lastMatchedBg, setLastMatchedBg] = React.useState<string | undefined>();
+  const [background, setBackground] = React.useState<string>('gaza.gif');
   useEffect(() => {
     if (!currentCard) return;
     playSound('bomb.mp3')
   }, [currentCard]);
   // Function to handle clicks on the front of the card
   const handleFrontClick = (card: Card) => {
-    console.log(card, currentCard)
     if (matchedIds.length === cards.length) {
       return;
     }
@@ -85,6 +86,7 @@ export default function Home() {
     if (currentCard?.value === card.value) {
       setMatchedIds((current) => [...current, card.id, currentCard.id])
       setLastMatchedBg(card.image);
+      setBackground(card.image);
       setTimeout(() => {
         setLastMatchedBg(undefined)
       }, 1000)
@@ -128,10 +130,17 @@ export default function Home() {
   </div>;
   return (
     <main
-      className="flex min-h-screen items-start justify-center pt-32">
-      <video className='absolute lg:h-full lg:inset-0 w-full h-1/2 bottom-0 ' autoPlay loop>
-        <source src='video.mp4' type='video/mp4' />
-      </video>
+      className="flex min-h-screen items-center lg:items-start justify-center pt-32">
+      <div style={{
+        background: `url(${background}) no-repeat center center`,
+        backgroundSize: '100% 100%'
+      }} className='absolute inset-0'>
+
+      </div>
+      {
+        !isMobile && <video className='absolute lg:h-full lg:inset-0 w-full h-1/2 bottom-0 ' autoPlay loop>
+          <source src='video.mp4' type='video/mp4' />
+        </video>}
       <div className='top-0 right-0 absolute bg-black bg-opacity-80 w-56 h-16 items-center flex justify-center'>
         <button className='px-8 py-2 bg-white text-black' onClick={reset}>Restart</button>
       </div>
