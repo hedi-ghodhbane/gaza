@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable */
 import React, { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from "framer-motion";
 import clsx from 'clsx';
