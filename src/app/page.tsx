@@ -30,7 +30,6 @@ const cardsData: Card[] = [
   { id: 16, name: 'card16', value: '8', image: '/9.jpg' },
 ]
 function shuffle(array: Card[]) {
-  return array;
   let currentIndex = array.length, randomIndex;
 
   // While there remain elements to shuffle.
