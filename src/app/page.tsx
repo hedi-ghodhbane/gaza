@@ -30,6 +30,7 @@ const cardsData: Card[] = [
   { id: 16, name: 'card16', value: '8', image: '/9.jpg' },
 ]
 function shuffle(array: Card[]) {
+  return array;
   let currentIndex = array.length, randomIndex;
 
   // While there remain elements to shuffle.
@@ -84,10 +85,12 @@ export default function Home() {
     if (currentCard?.value === card.value) {
       setMatchedIds((current) => [...current, card.id, currentCard.id])
       setLastMatchedBg(card.image);
+      setTimeout(() => {
+        setLastMatchedBg(undefined)
+      }, 1000)
+
       setCurrentCard(undefined);
-      playSound('success.mp3');
     } else if (currentCard && currentCard?.value !== card.value) {
-      playSound('fail.mp3');
       setCurrentCard(undefined)
       setTimeout(() => {
         setFlippedIds((current) => current.filter(id => id !== currentCard?.id && id !== card.id))
@@ -104,7 +107,13 @@ export default function Home() {
     };
     setFlippedIds((current) => current.filter(id => id !== card.id))
   };
-
+  const reset = () => {
+    setCards(shuffle([...cardsData]))
+    setFlippedIds([])
+    setMatchedIds([])
+    setCurrentCard(undefined)
+    setLastMatchedBg(undefined)
+  }
   // Function to check if a card is flipped or matched
   const isCardFlipped = (card: Card) => flippedIds.includes(card.id) || matchedIds.includes(card.id);
 
@@ -113,29 +122,36 @@ export default function Home() {
       background: `url(bg.jpeg) no-repeat center center`,
       backgroundSize: '100% 100%',
     }}
-    className='min-h-screen flex-col gap-8 w-full flex items-center justify-center px-24 py-4'>
-    <h1 className='py-2 bg-black bg-opacity-50 text-3xl text-center'>We're sorry for the images - but this is what Gaza's children are facing everyday! They are being murdered without any mercy!</h1>
+    className='min-h-screen flex-col gap-8 w-full flex items-center justify-center px-2 lg:px-24 py-4'>
+    <h1 className='py-2 bg-black bg-opacity-50 text-xl lg:text-3xl text-center'>We're sorry for the images - but this is what Gaza's children are facing everyday! They are being murdered without any mercy!</h1>
     <button className='text-3xl bg-white rounded-lg shadow-md shadow-black hover:shadow-red-500 text-black py-2 px-4' onClick={() => setCards(shuffle([...cardsData]))}>Start the game</button>
   </div>;
   return (
     <main
       className="flex min-h-screen items-start justify-center pt-32">
-      <video className='absolute inset-0 w-full' autoPlay loop>
+      <video className='absolute lg:h-full lg:inset-0 w-full h-1/2 bottom-0 ' autoPlay loop>
         <source src='video.mp4' type='video/mp4' />
       </video>
+      <div className='top-0 right-0 absolute bg-black bg-opacity-80 w-56 h-16 items-center flex justify-center'>
+        <button className='px-8 py-2 bg-white text-black' onClick={reset}>Restart</button>
+      </div>
       <AnimatePresence>
-        {lastMatchedBg && <motion.img
+        {lastMatchedBg && <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          src={lastMatchedBg} className='absolute left-20 top-[20%] bottom-0 w-96 h-96 z-20 rounded-lg shadow-md shadow-red-400' />}
+          style={{
+            background: `url(${lastMatchedBg}) no-repeat center center`,
+            backgroundSize: 'cover',
+          }}
+          className='overflow-hidden shadow-red-400 shadow-2xl ring-8 ring-red-500 absolute flex inset-2 z-20' />}
       </AnimatePresence>
       <div
         className="grid grid-cols-4 grid-rows-8 gap-3">
         {cards.map((card) => (
           <div
             key={card.id}
-            className={clsx("w-32 h-32 relative rounded-lg hover:shadow-white hover:shadow-sm cursor-pointer overflow-hidden", {
+            className={clsx("lg:w-32 lg:h-32 w-20 h-20 relative rounded-lg hover:shadow-white hover:shadow-sm cursor-pointer overflow-hidden", {
               'opacity-80 border-2 ring-2 ring-green-400': matchedIds.includes(card.id)
             })}>
             <motion.div
